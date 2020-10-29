@@ -125,10 +125,13 @@ def not_found_404(error):
         }), 404
 
 
-'''
-@TODO implement error handler for 404
-    error handler should conform to general task above 
-'''
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "unauthorized"
+        }), 401
 
 
 '''
