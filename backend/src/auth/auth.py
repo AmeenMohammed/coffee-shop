@@ -9,38 +9,40 @@ AUTH0_DOMAIN = 'fnsd.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'Coffee'
 
-## AuthError Exception
+# AuthError Exception
 '''
 AuthError Exception
 A standardized way to communicate auth failure modes
 '''
+
+
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
 
 
-## Auth Header
+# Auth Header
 def get_token_auth_header():
-    
+
     authorization = request.headers.get('Authorization', None)
     if not authorization:
         raise AuthError({
-        'code': 'authorization_header_missing',
-        'description': 'Authorization header is expected'
+            'code': 'authorization_header_missing',
+            'description': 'Authorization header is expected'
         }, 401)
 
     auth_header = authorization.split()
     if auth_header[0].lower() != 'bearer':
         raise AuthError({
-        'code': 'invalid_header',
-        'description' : 'Authorization header must start with Bearer'
+            'code': 'invalid_header',
+            'description': 'Authorization header must start with Bearer'
         }, 401)
 
     elif len(auth_header) == 1:
         raise AuthError({
-        'code': 'invalid_header',
-        'description' : 'token not found'
+            'code': 'invalid_header',
+            'description': 'token not found'
         }, 401)
 
     elif len(auth_header) > 2:
@@ -51,7 +53,9 @@ def get_token_auth_header():
 
     return auth_header[1]
 
-## check permissions
+# check permissions
+
+
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
         raise AuthError({
@@ -67,14 +71,16 @@ def check_permissions(permission, payload):
 
     return True
 
-## decode and verify jwt
+# decode and verify jwt
+
+
 def verify_decode_jwt(token):
 
     json_url = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(json_url.read())
     unverified_header = jwt.get_unverified_header(token)
     rsa_key = {}
-    
+
     if 'kid' not in unverified_header:
         raise AuthError({
             'code': 'invalid_header',
@@ -90,7 +96,7 @@ def verify_decode_jwt(token):
                 'n': key['n'],
                 'e': key['e']
             }
-            
+
     if rsa_key:
         try:
             payload = jwt.decode(
@@ -122,9 +128,9 @@ def verify_decode_jwt(token):
             }, 400)
 
     raise AuthError({
-                'code': 'invalid_header',
+        'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
-            }, 400)
+    }, 400)
 
 
 def requires_auth(permission=''):
